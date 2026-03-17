@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title='Course List')}"></head>
+<body>
+    <div th:replace="~{fragments/layout :: navbar}"></div>
+
+    <div class="container mt-5">
+        
+        <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            Course successfully created!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Courses</h2>
+            <a th:href="@{/courses/create}" class="btn btn-success">Add New Course</a>
+        </div>
+
+        <!-- Filter Form -->
+        <div class="card mb-4">
+            <div class="card-body bg-light">
+                <form class="row g-3 align-items-end" th:action="@{/courses}" method="GET">
+                    <div class="col-md-4">
+                        <label for="departmentFilter" class="form-label">Department</label>
+                        <select name="department" id="departmentFilter" class="form-select">
+                            <option value="">All Departments</option>
+                            <option value="Computer Science" th:selected="${department == 'Computer Science'}">Computer Science</option>
+                            <option value="Mathematics" th:selected="${department == 'Mathematics'}">Mathematics</option>
+                            <option value="Business" th:selected="${department == 'Business'}">Business</option>
+                            <option value="Engineering" th:selected="${department == 'Engineering'}">Engineering</option>
+                            <option value="Arts" th:selected="${department == 'Arts'}">Arts</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="minCreditsFilter" class="form-label">Min Credits</label>
+                        <input type="number" name="minCredits" id="minCreditsFilter" class="form-control" th:value="${minCredits}">
+                    </div>
+                    <div class="col-md-4">
+                        <!-- Retain sort and size if applicable, else rely on defaults or explicit fields -->
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <a th:href="@{/courses}" class="btn btn-outline-secondary">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Course Table -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>
+                            <a th:href="@{/courses(department=${department}, minCredits=${minCredits}, page=${page.number}, sort='code', size=${page.size})}" class="text-white text-decoration-none">
+                                Code <i class="bi bi-sort-alpha-down"></i>
+                            </a>
+                        </th>
+                        <th>
+                            <a th:href="@{/courses(department=${department}, minCredits=${minCredits}, page=${page.number}, sort='name', size=${page.size})}" class="text-white text-decoration-none">
+                                Name
+                            </a>
+                        </th>
+                        <th>
+                            <a th:href="@{/courses(department=${department}, minCredits=${minCredits}, page=${page.number}, sort='credits', size=${page.size})}" class="text-white text-decoration-none">
+                                Credits
+                            </a>
+                        </th>
+                        <th>
+                            <a th:href="@{/courses(department=${department}, minCredits=${minCredits}, page=${page.number}, sort='department', size=${page.size})}" class="text-white text-decoration-none">
+                                Department
+                            </a>
+                        </th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="course : ${page.content}">
+                        <td th:text="${course.code}">CPAN228</td>
+                        <td th:text="${course.name}">Advanced Web</td>
+                        <td th:text="${course.credits}">3</td>
+                        <td th:text="${course.department}">Computer Science</td>
+                        <td th:text="${#temporals.format(course.createdAt, 'yyyy-MM-dd HH:mm')}">2026-03-01</td>
+                    </tr>
+                    <tr th:if="${page.empty}">
+                        <td colspan="5" class="text-center">No courses found matching criteria.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <nav th:if="${page.totalPages > 1}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${page.first ? 'disabled' : ''}">
+                    <!-- Add explicit sorting/pagination URL building as needed -->
+                    <a class="page-link" th:href="@{/courses(department=${department}, minCredits=${minCredits}, page=${page.number - 1}, sort=${page.sort.toString().replace(': ', ',')}, size=${page.size})}">Previous</a>
+                </li>
+                
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" 
+                    th:classappend="${i == page.number ? 'active' : ''}">
+                    <a class="page-link" th:href="@{/courses(department=${department}, minCredits=${minCredits}, page=${i}, sort=${page.sort.toString().replace(': ', ',')}, size=${page.size})}" th:text="${i + 1}">1</a>
+                </li>
+
+                <li class="page-item" th:classappend="${page.last ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{/courses(department=${department}, minCredits=${minCredits}, page=${page.number + 1}, sort=${page.sort.toString().replace(': ', ',')}, size=${page.size})}">Next</a>
+                </li>
+            </ul>
+        </nav>
+
+    </div>
+
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
