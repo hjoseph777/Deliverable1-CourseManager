@@ -57,9 +57,5 @@ This submission covers everything required for the March 15 deadline:
 
 ---
 
-## Setup Instructions
-1.  Make sure you have Java 17 and Maven installed.
-2.  Run `mvn clean install` to build the project.
-3.  Run `mvn spring-boot:run` to start the server.
-4.  If port 8081 is busy, use the `run-app.md` workflow to clear it.
+
 
